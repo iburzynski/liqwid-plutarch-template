@@ -1,0 +1,116 @@
+cabal-version:      3.4
+name:               jambhalarch
+version:            0.1.0.0
+author:             iburzynski
+maintainer:         23251244+iburzynski@users.noreply.github.com
+extra-source-files: README.md
+
+common lang
+  ghc-options:
+    -Werror -Wall -Wcompat -Wincomplete-uni-patterns
+    -Wno-unused-do-bind -Wno-partial-type-signatures
+    -Wincomplete-record-updates -Wno-name-shadowing -Wunused-foralls
+    -fprint-explicit-foralls -fprint-explicit-kinds -Wunused-do-bind
+
+  default-extensions:
+    NoStarIsType
+    BangPatterns
+    BinaryLiterals
+    ConstrainedClassMethods
+    ConstraintKinds
+    DataKinds
+    DeriveAnyClass
+    DeriveDataTypeable
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DerivingStrategies
+    DerivingVia
+    DoAndIfThenElse
+    DuplicateRecordFields
+    EmptyCase
+    EmptyDataDecls
+    EmptyDataDeriving
+    ExistentialQuantification
+    ExplicitForAll
+    FlexibleContexts
+    FlexibleInstances
+    ForeignFunctionInterface
+    GADTSyntax
+    GeneralisedNewtypeDeriving
+    HexFloatLiterals
+    ImplicitPrelude
+    ImportQualifiedPost
+    InstanceSigs
+    KindSignatures
+    LambdaCase
+    MonomorphismRestriction
+    MultiParamTypeClasses
+    NamedFieldPuns
+    NamedWildCards
+    NumericUnderscores
+    OverloadedLabels
+    OverloadedStrings
+    PackageImports
+    PartialTypeSignatures
+    PatternGuards
+    PolyKinds
+    PostfixOperators
+    QualifiedDo
+    RankNTypes
+    RecordWildCards
+    RelaxedPolyRec
+    ScopedTypeVariables
+    StandaloneDeriving
+    StandaloneKindSignatures
+    TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+    TypeSynonymInstances
+    UndecidableInstances
+    ViewPatterns
+    NoFieldSelectors
+    OverloadedRecordDot
+
+  default-language:   GHC2021
+
+common dependencies
+  build-depends:
+    , aeson
+    , aeson-pretty
+    , base
+    , base16-bytestring
+    , bytestring
+    , cardano-binary
+    , cborg
+    , data-default
+    , directory
+    , liqwid-plutarch-extra
+    , plutarch
+    , plutarch-extra
+    , plutus-core
+    , plutus-ledger-api
+    , plutus-tx
+    , ply-core
+    , ply-plutarch
+    , serialise
+    , text
+
+-- , plutus-simple-model
+library
+  import:          lang, dependencies
+  exposed-modules:
+    Samples.Simple
+    Utils
+
+  build-depends:
+  hs-source-dirs:  src
+
+executable jambhalarch
+  import:         lang, dependencies
+  main-is:        Main.hs
+  build-depends:  jambhalarch
+  hs-source-dirs: app
