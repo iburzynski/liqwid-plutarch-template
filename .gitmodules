@@ -1,0 +1,9 @@
+[submodule "jsetup-utils"]
+	path = jsetup-utils
+	url = https://github.com/iburzynski/jsetup-utils
+[submodule "cardano-cli-guru"]
+	path = cardano-cli-guru
+	url = https://github.com/iburzynski/cardano-cli-guru
+[submodule "cardano-ez-installer"]
+	path = cardano-ez-installer
+	url = https://github.com/iburzynski/cardano-ez-installer

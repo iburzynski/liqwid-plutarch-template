@@ -85,31 +85,44 @@ common dependencies
     , base16-bytestring
     , bytestring
     , cardano-binary
+    , cardano-simple
     , cborg
+    , containers
     , data-default
     , directory
+    , extra
     , liqwid-plutarch-extra
+    , mtl
+    , optparse-applicative
     , plutarch
     , plutarch-extra
     , plutus-core
     , plutus-ledger-api
+    , plutus-simple-model
     , plutus-tx
     , ply-core
     , ply-plutarch
     , serialise
+    , tasty
+    , tasty-hunit
     , text
+    , vector
 
--- , plutus-simple-model
 library
   import:          lang, dependencies
   exposed-modules:
-    Samples.Simple
-    Utils
+    Contracts
+    Contracts.Samples.Simple
+    Jambhalarch.CLI
+    Jambhalarch.CLI.Export
+    Jambhalarch.CLI.Parsers
+    Jambhalarch.CLI.Types
+    Jambhalarch.Utils
 
   build-depends:
   hs-source-dirs:  src
 
-executable jambhalarch
+executable jamb
   import:         lang, dependencies
   main-is:        Main.hs
   build-depends:  jambhalarch

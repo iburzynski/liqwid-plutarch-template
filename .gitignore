@@ -23,3 +23,8 @@ cabal.project.local~
 .ghc.environment.*
 
 .pre-commit-config.yaml
+
+.direnv
+.env
+
+*.old

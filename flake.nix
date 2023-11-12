@@ -1,5 +1,5 @@
 {
-  description = "A liqwid-nix Plutarch template";
+  description = "Jambhalarch: Plutarch Development Template";
 
   nixConfig = {
     extra-experimental-features = [ "nix-command" "flakes" "ca-derivations" ];
@@ -9,7 +9,7 @@
       "loony-tools:pr9m4BkM/5/eSTZlkQyRt57Jz7OMBxNSUiMC4FkcNfk="
     ];
     allow-import-from-derivation = "true";
-    # max-jobs = "auto";
+    max-jobs = "auto";
     auto-optimise-store = "true";
   };
 
@@ -17,12 +17,13 @@
     nixpkgs.follows = "liqwid-nix/nixpkgs";
     nixpkgs-latest.url = "github:NixOS/nixpkgs";
     liqwid-nix = {
-      url = "github:Liqwid-Labs/liqwid-nix/v2.9.2";
+      url = "github:iburzynski/liqwid-nix";
       inputs.nixpkgs-latest.follows = "nixpkgs-latest";
     };
     liqwid-libs.url =
       "github:Liqwid-Labs/liqwid-libs";
-    # plutus-simple-model.url = "github:mlabs-haskell/plutus-simple-model";
+    plutus-simple-model.url = "github:iburzynski/plutus-simple-model";
+    cardano-base.url = "github:input-output-hk/cardano-base/cardano-strict-containers-0.1.1.0";
   };
 
   outputs = inputs@{ self, flake-parts, ... }:
@@ -37,9 +38,6 @@
         in
         {
           # See: https://liqwid-labs.github.io/liqwid-nix/reference/modules.html
-          apps = {
-            # default.program = 
-          };
           onchain.default = {
             src = ./.;
             ghc.version = "ghc925";
@@ -48,8 +46,37 @@
             cabalFmt = { };
             hasktags = { };
             applyRefact = { };
-            shell = { };
-            hoogleImage.enable = false;
+            shell = {
+              extraCommandLineTools = with pkgs; [
+                bashInteractive
+                gnugrep
+                httpie
+                just
+                neovim
+                nixpkgs-fmt
+                nix-prefetch-git
+                nodejs-18_x
+                nodePackages.pnpm
+                python311
+                python311Packages.autopep8
+                (vscode-with-extensions.override {
+                  vscode = pkgs.vscodium;
+                  vscodeExtensions = with pkgs.vscode-extensions; [
+                    asvetliakov.vscode-neovim
+                    dracula-theme.theme-dracula
+                    haskell.haskell
+                    jnoortheen.nix-ide
+                    justusadam.language-haskell
+                    mkhl.direnv
+                    ms-python.python
+                    ms-python.vscode-pylance
+                    esbenp.prettier-vscode
+                  ];
+                })
+                xdg-utils
+              ];
+            };
+            hoogleImage.enable = true;
             enableCabalFormatCheck = true;
             enableHaskellFormatCheck = true;
             enableBuildChecks = true;
@@ -61,7 +88,9 @@
               "${inputs.liqwid-libs}/plutarch-unit"
               "${inputs.liqwid-libs.inputs.ply}/ply-core"
               "${inputs.liqwid-libs.inputs.ply}/ply-plutarch"
-              # "${inputs.plutus-simple-model}/psm"
+              "${inputs.plutus-simple-model}/psm"
+              "${inputs.plutus-simple-model}/cardano-simple"
+              "${inputs.cardano-base}/cardano-strict-containers"
             ];
           };
           ci.required = [ "all_onchain" ];

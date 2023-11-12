@@ -1,8 +1,9 @@
 module Main where
 
-import Samples.Simple qualified as Simple
-import Utils (writePlutusScript)
+import Contracts (contracts, samples)
+import Jambhalarch.CLI (runJamb)
 
 main :: IO ()
-main = do
-  writePlutusScript "gift" "./compiled/gift.plutus" Simple.gift
+main = runJamb allContracts -- << replace `allContracts` with `contracts` to hide sample contracts
+  where
+    allContracts = contracts <> samples

@@ -1,1 +1,2 @@
-# liqwid-plutarch-template
+# Jambhalarch: Plutarch Development Template
+A template for writing Cardano smart contracts using Plutarch, built on Liqwid's Nix tooling. Over time, this template will evolve into a full-featured development suite, mirroring the Jambhala project for PlutusTx.
