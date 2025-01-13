@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 submodules=("jsetup-utils" "cardano-cli-guru" "cardano-ez-installer")
 
 for submodule in "${submodules[@]}"

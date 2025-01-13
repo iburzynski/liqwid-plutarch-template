@@ -54,7 +54,7 @@ import Test.Tasty (TestTree, defaultIngredients)
 import Test.Tasty.Ingredients (tryIngredients)
 import Text.Printf (printf)
 
-runJamb :: MonadIO m => JambContracts -> m ()
+runJamb :: (MonadIO m) => JambContracts -> m ()
 runJamb = runReaderT (commandParser >>= liftIO . execParser >>= runCommand)
 
 runCommand :: (MonadReader JambContracts m, MonadIO m) => Command -> m ()
@@ -68,12 +68,12 @@ runCommand = \case
       asks (M.lookup contract)
         >>= maybe (liftIO . putStrLn $ "Error: contract \"" ++ contract ++ "\" not found") eff
 
-writeScriptWithData :: MonadIO m => FileName -> ContractExports -> m ()
+writeScriptWithData :: (MonadIO m) => FileName -> ContractExports -> m ()
 writeScriptWithData fn (ContractExports s ds _) = do
   _ <- liftIO $ writeScriptToFile fn s
   liftIO $ traverse_ writeDataToFile ds
 
-writeScriptToFile :: MonadIO m => FileName -> ClosedTerm a -> m ()
+writeScriptToFile :: (MonadIO m) => FileName -> ClosedTerm a -> m ()
 writeScriptToFile fn term = do
   fp <- liftIO $ mkFilePath "PLUTUS_SCRIPTS_PATH" "cardano-cli-guru/assets/scripts/plutus" fn ".plutus"
   fileOverwritePrompt fp $ case evalT term of
@@ -87,7 +87,7 @@ writeScriptToFile fn term = do
       liftIO . putStrLn $ "Wrote script to '" ++ fp ++ "'"
       liftIO . LBS.writeFile fp $ AEP.encodePretty' cfg pf
 
-mkFilePath :: MonadIO m => EnvVar -> DefDir -> FileName -> FileExt -> m FilePath
+mkFilePath :: (MonadIO m) => EnvVar -> DefDir -> FileName -> FileExt -> m FilePath
 mkFilePath envVar defDir fn ext = do
   mDir <- liftIO $ lookupEnv envVar
   case mDir >>= stripTrailingSlash of
@@ -115,14 +115,14 @@ mkFilePath envVar defDir fn ext = do
         , ext
         ]
 
-    mkDefFilePath :: MonadIO m => m FilePath
+    mkDefFilePath :: (MonadIO m) => m FilePath
     mkDefFilePath = do
       defDirExists <- liftIO $ doesDirectoryExist defDir
       if defDirExists
         then pure $ mkFilePath' defDir
         else error $ concat ["Error: default directory '", defDir, "' does not exist."]
 
-fileOverwritePrompt :: MonadIO m => FileName -> m () -> m ()
+fileOverwritePrompt :: (MonadIO m) => FileName -> m () -> m ()
 fileOverwritePrompt fn writeAction = do
   liftIO $ hSetBuffering stdin NoBuffering
   liftIO $ hSetBuffering stdout NoBuffering
@@ -138,13 +138,13 @@ fileOverwritePrompt fn writeAction = do
         _ -> liftIO (putStrLn "Invalid response. Please enter Y or N.") >> fileOverwritePrompt fn writeAction
     else writeAction
 
-writeDataToFile :: MonadIO m => DataExport -> m ()
+writeDataToFile :: (MonadIO m) => DataExport -> m ()
 writeDataToFile (DataExport fn d) = do
   fp <- mkFilePath "DATA_PATH" "cardano-cli-guru/assets/data" fn ".json"
   let v = dataToJSON d
   fileOverwritePrompt fp $ liftIO (writeFileJSON fp v)
   where
-    dataToJSON :: ToData a => a -> Aeson.Value
+    dataToJSON :: (ToData a) => a -> Aeson.Value
     dataToJSON = toJSON . fromPlutusData . toData
 
 fromPlutusData :: Plutus.Data -> ScriptData
@@ -163,10 +163,10 @@ fromPlutusData (Plutus.List xs) =
 fromPlutusData (Plutus.I n) = ScriptDataNumber n
 fromPlutusData (Plutus.B bs) = ScriptDataBytes bs
 
-serialiseToJSON :: ToJSON a => a -> ByteString
+serialiseToJSON :: (ToJSON a) => a -> ByteString
 serialiseToJSON = LBS.toStrict . Aeson.encode
 
-prettyPrintJSON :: ToJSON a => a -> ByteString
+prettyPrintJSON :: (ToJSON a) => a -> ByteString
 prettyPrintJSON = LBS.toStrict . encodePretty
 
 encodeSerialiseCBOR :: Script -> Text
@@ -183,7 +183,7 @@ evalT :: ClosedTerm a -> Either Text (Script, ExBudget, [Text])
 evalT = evalWithArgsT []
 
 writeFileJSON ::
-  ToJSON a =>
+  (ToJSON a) =>
   FilePath ->
   a ->
   IO ()

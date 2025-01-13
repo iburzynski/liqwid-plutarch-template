@@ -5,7 +5,7 @@ import Data.Map.Strict qualified as M
 import Jambhalarch.CLI.Types
 import Options.Applicative
 
-commandParser :: MonadReader JambContracts m => m (ParserInfo Command)
+commandParser :: (MonadReader JambContracts m) => m (ParserInfo Command)
 commandParser = do
   pw <- parseWrite
   pt <- parseTest
@@ -15,7 +15,7 @@ commandParser = do
 parseList :: Parser Command
 parseList = flag' List (long "list" <> short 'l' <> help "List the available contracts")
 
-parseTest :: MonadReader JambContracts m => m (Parser Command)
+parseTest :: (MonadReader JambContracts m) => m (Parser Command)
 parseTest =
   fmap (fmap Test) . parseContractName $
     mconcat
@@ -25,7 +25,7 @@ parseTest =
       , help "Run tests for CONTRACT"
       ]
 
-parseWrite :: MonadReader JambContracts m => m (Parser Command)
+parseWrite :: (MonadReader JambContracts m) => m (Parser Command)
 parseWrite =
   fmap ((<*> parseFName) . fmap Write) . parseContractName $
     mconcat
@@ -37,7 +37,7 @@ parseWrite =
   where
     parseFName = optional $ argument str (metavar "FILENAME")
 
-parseContractName :: MonadReader JambContracts m => Mod OptionFields String -> m (Parser String)
+parseContractName :: (MonadReader JambContracts m) => Mod OptionFields String -> m (Parser String)
 parseContractName fields = do
   contracts <- ask
   let readMName = eitherReader $ \c ->

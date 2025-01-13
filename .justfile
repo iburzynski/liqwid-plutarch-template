@@ -17,8 +17,8 @@
   fi
 
 # jamb cli
-@cli *FLAGS:
-  cabal run . -- {{FLAGS}}
+@cli *OPTS:
+  cabal run . -- {{ OPTS }}
 
 # cabal repl
 @repl:
@@ -32,9 +32,7 @@ hls-bin := `which haskell-language-server`
 
 # generate .env file from template
 @mk-env:
-  if [ ! -f .env ]; then \
-    cp jsetup-utils/.env-template .env; \
-  fi
+  mk-env.sh
 
 # create HLS symlink
 @link-hls:
@@ -54,7 +52,29 @@ haskell-sources := "$(git ls-tree -r HEAD --full-tree --name-only | grep '.\\+\\
 cabal-sources := "$(git ls-tree -r HEAD --full-tree --name-only | grep '.\\+\\.cabal')"
 fourmolu-exts := "-o -XQuasiQuotes -o -XTemplateHaskell -o -XTypeApplications -o -XImportQualifiedPost -o -XPatternSynonyms -o -XOverloadedRecordDot"
 
+# format *.nix, *.cabal, and *.hs files
 @fmt:
-  find . -name '*.nix' -not -path './dist*/*' -not -path './haddock/*' -exec nixpkgs-fmt {} +
-  cabal-fmt -i {{ cabal-sources }}
-  fourmolu {{ fourmolu-exts }} -m inplace {{ haskell-sources }}
+  find . -name '*.nix' -not -path './dist*/*' -not -path './haddock/*' -exec nixpkgs-fmt --check {} + > /dev/null 2>&1
+  cabal-fmt -i {{ cabal-sources }} > /dev/null 2>&1
+  fourmolu {{ fourmolu-exts }} -m inplace {{ haskell-sources }} > /dev/null 2>&1
+
+# run cardano-ez-installer
+@cardano-install:
+  python3 cardano-ez-installer/main.py
+
+node-network-id := env_var('CARDANO_NODE_NETWORK_ID')
+node-network := if node-network-id == "1" { "preprod" } else if node-network-id == "2" { "preview" } else { "mainnet" }
+cardano-path := env_var('CARDANO_PATH')
+network-path := cardano-path / node-network
+socket-path := cardano-path / "node.socket"
+config-path := network-path / "config"
+node-port := "1337"
+
+# run cardano-node
+@node:
+  cardano-node run \
+  --topology {{ config-path }}/topology.json \
+  --database-path {{ network-path }}/db \
+  --socket-path {{ socket-path }} \
+  --port {{ node-port }} \
+  --config {{ config-path }}/config.json
